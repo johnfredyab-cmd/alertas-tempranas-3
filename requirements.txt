@@ -4,5 +4,6 @@ pandas
 numpy
 matplotlib
 seaborn
+wordcloud
+nltk
 openpyxl
-scikit-learn

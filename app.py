@@ -12,8 +12,15 @@ import seaborn as sns
 import plotly.express as px
 import textwrap
 from collections import Counter
-from wordcloud import WordCloud
 import string
+
+# Importación opcional de wordcloud
+try:
+    from wordcloud import WordCloud
+    WORDCLOUD_AVAILABLE = True
+except ImportError:
+    WORDCLOUD_AVAILABLE = False
+    st.warning("⚠️ La librería wordcloud no está disponible. La pestaña de Nube de Palabras estará deshabilitada.")
 
 # Configuración de la página
 st.set_page_config(
@@ -150,12 +157,20 @@ st.markdown("---")
 #                   TABS PARA DIFERENTES VISUALIZACIONES
 # ============================================================
 
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📊 Reportes por Asignatura", 
-    "📈 Razones del Bajo Desempeño",
-    "🔥 Asignatura vs Razón",
-    "☁️ Nube de Palabras"
-])
+if WORDCLOUD_AVAILABLE:
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📊 Reportes por Asignatura", 
+        "📈 Razones del Bajo Desempeño",
+        "🔥 Asignatura vs Razón",
+        "☁️ Nube de Palabras"
+    ])
+else:
+    tab1, tab2, tab3 = st.tabs([
+        "📊 Reportes por Asignatura", 
+        "📈 Razones del Bajo Desempeño",
+        "🔥 Asignatura vs Razón"
+    ])
+    tab4 = None
 
 # ============================================================
 #                   TAB 1: REPORTES POR ASIGNATURA
@@ -297,77 +312,78 @@ with tab3:
 #                   TAB 4: NUBE DE PALABRAS
 # ============================================================
 
-with tab4:
-    st.header("Nube de Palabras sobre Causas del Bajo Desempeño")
-    
-    if df_filtered[col_preg1].dropna().empty:
-        st.warning("⚠️ No hay datos suficientes para generar la nube de palabras")
-    else:
-        # Stopwords personalizadas
-        stopwords_extra = {
-            "me", "si", "hay", "porque", "suficiente", "ya", "solo", "más", "menos",
-            "muy", "puede", "puedo", "fue", "soy", "estoy", "era", "esta", "ese", "eso",
-            "lo", "la", "las", "los", "el", "un", "una", "uno", "unos", "unas",
-            "al", "del", "de", "por", "con", "para", "sin", "sobre", "entre",
-            "que", "se", "yo", "tu", "mi"
-        }
+if tab4 is not None and WORDCLOUD_AVAILABLE:
+    with tab4:
+        st.header("Nube de Palabras sobre Causas del Bajo Desempeño")
         
-        # Construir texto
-        texto = " ".join(df_filtered[col_preg1].dropna())
-        texto = texto.lower()
-        texto = texto.translate(str.maketrans("", "", string.punctuation))
-        
-        tokens = texto.split()
-        
-        # Filtrar palabras
-        palabras_filtradas = [
-            t for t in tokens
-            if t not in stopwords_extra and len(t) > 2
-        ]
-        
-        # Crear bigramas
-        bigramas = []
-        for w1, w2 in zip(tokens, tokens[1:]):
-            if (w1 not in stopwords_extra or w2 not in stopwords_extra) \
-               and len(w1) > 2 and len(w2) > 2:
-                bigramas.append(f"{w1} {w2}")
-        
-        # Contar frecuencias
-        frecuencias = Counter()
-        for palabra in palabras_filtradas:
-            frecuencias[palabra] += 1
-        for bg in bigramas:
-            frecuencias[bg] += 2
-        
-        if not frecuencias:
-            st.warning("⚠️ No hay palabras significativas después de la limpieza")
+        if df_filtered[col_preg1].dropna().empty:
+            st.warning("⚠️ No hay datos suficientes para generar la nube de palabras")
         else:
-            # Generar nube de palabras
-            wordcloud = WordCloud(
-                width=1200,
-                height=600,
-                background_color="white",
-                colormap="Reds",
-                max_words=300
-            ).generate_from_frequencies(frecuencias)
+            # Stopwords personalizadas
+            stopwords_extra = {
+                "me", "si", "hay", "porque", "suficiente", "ya", "solo", "más", "menos",
+                "muy", "puede", "puedo", "fue", "soy", "estoy", "era", "esta", "ese", "eso",
+                "lo", "la", "las", "los", "el", "un", "una", "uno", "unos", "unas",
+                "al", "del", "de", "por", "con", "para", "sin", "sobre", "entre",
+                "que", "se", "yo", "tu", "mi"
+            }
             
-            # Mostrar
-            fig_wordcloud, ax = plt.subplots(figsize=(16, 8))
-            ax.imshow(wordcloud, interpolation="bilinear")
-            ax.axis("off")
-            plt.title("Nube de Palabras: Causas del Bajo Desempeño", 
-                     fontsize=18, fontweight="bold")
+            # Construir texto
+            texto = " ".join(df_filtered[col_preg1].dropna())
+            texto = texto.lower()
+            texto = texto.translate(str.maketrans("", "", string.punctuation))
             
-            st.pyplot(fig_wordcloud)
-            plt.close()
+            tokens = texto.split()
             
-            # Mostrar palabras más frecuentes
-            st.subheader("🔤 Palabras/Frases Más Frecuentes")
-            palabras_top = pd.DataFrame(
-                frecuencias.most_common(20),
-                columns=["Palabra/Frase", "Frecuencia"]
-            )
-            st.dataframe(palabras_top, use_container_width=True)
+            # Filtrar palabras
+            palabras_filtradas = [
+                t for t in tokens
+                if t not in stopwords_extra and len(t) > 2
+            ]
+            
+            # Crear bigramas
+            bigramas = []
+            for w1, w2 in zip(tokens, tokens[1:]):
+                if (w1 not in stopwords_extra or w2 not in stopwords_extra) \
+                   and len(w1) > 2 and len(w2) > 2:
+                    bigramas.append(f"{w1} {w2}")
+            
+            # Contar frecuencias
+            frecuencias = Counter()
+            for palabra in palabras_filtradas:
+                frecuencias[palabra] += 1
+            for bg in bigramas:
+                frecuencias[bg] += 2
+            
+            if not frecuencias:
+                st.warning("⚠️ No hay palabras significativas después de la limpieza")
+            else:
+                # Generar nube de palabras
+                wordcloud = WordCloud(
+                    width=1200,
+                    height=600,
+                    background_color="white",
+                    colormap="Reds",
+                    max_words=300
+                ).generate_from_frequencies(frecuencias)
+                
+                # Mostrar
+                fig_wordcloud, ax = plt.subplots(figsize=(16, 8))
+                ax.imshow(wordcloud, interpolation="bilinear")
+                ax.axis("off")
+                plt.title("Nube de Palabras: Causas del Bajo Desempeño", 
+                         fontsize=18, fontweight="bold")
+                
+                st.pyplot(fig_wordcloud)
+                plt.close()
+                
+                # Mostrar palabras más frecuentes
+                st.subheader("🔤 Palabras/Frases Más Frecuentes")
+                palabras_top = pd.DataFrame(
+                    frecuencias.most_common(20),
+                    columns=["Palabra/Frase", "Frecuencia"]
+                )
+                st.dataframe(palabras_top, use_container_width=True)
 
 # ============================================================
 #                   FOOTER
