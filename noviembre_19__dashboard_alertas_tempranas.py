@@ -56,7 +56,7 @@ df_filtered["Mes"] = df_filtered[col_fecha].dt.month
 
 """Frecuecnia por asignatura"""
 
-!pip install -q ipywidgets
+
 
 """`*`*`Cantidad de reportes por asignatura`*`*`"""
 
@@ -180,7 +180,7 @@ df_filtered[col_fecha] = pd.to_datetime(df_filtered[col_fecha], errors="coerce")
 df_filtered["Año"] = df_filtered[col_fecha].dt.year
 df_filtered["Mes"] = df_filtered[col_fecha].dt.month
 
-!pip install -q ipywidgets
+
 from google.colab import output
 output.enable_custom_widget_manager()
 
@@ -315,7 +315,7 @@ widgets.interact(
 
 """**Asignatura vs Razón**"""
 
-!pip install ipywidgets
+
 from google.colab import output
 output.enable_custom_widget_manager()
 
@@ -398,7 +398,7 @@ widgets.interact(
 
 """**Nube de palabras**"""
 
-!pip install -q wordcloud
+
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import nltk
@@ -543,4 +543,3 @@ st.plotly_chart(fig, use_container_width=True)
 with open("app.py", "w") as f:
     f.write(app_code)
 
-!pip install streamlit plotly pandas
