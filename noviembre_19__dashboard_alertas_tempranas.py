@@ -61,7 +61,7 @@ df_filtered["Mes"] = df_filtered[col_fecha].dt.month
 """`*`*`Cantidad de reportes por asignatura`*`*`"""
 
 ##from google.colab import output
-output.enable_custom_widget_manager()
+#output.enable_custom_widget_manager()
 
 import ipywidgets as widgets
 from IPython.display import display
@@ -182,7 +182,7 @@ df_filtered["Mes"] = df_filtered[col_fecha].dt.month
 
 
 ##from google.colab import output
-output.enable_custom_widget_manager()
+#output.enable_custom_widget_manager()
 
 """***Razones del bajo desempeño***
 
@@ -317,7 +317,7 @@ widgets.interact(
 
 
 ##from google.colab import output
-output.enable_custom_widget_manager()
+#output.enable_custom_widget_manager()
 
 import ipywidgets as widgets
 import matplotlib.pyplot as plt
